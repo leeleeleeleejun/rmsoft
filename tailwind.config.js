@@ -13,6 +13,8 @@ export default {
       gray: "#e9ecef",
       gray2: "#D1C5C0",
       darkgray: "#6A6A77",
+
+      opacityBlack: "rgba(0, 0, 0, 0.4)",
     },
   },
   plugins: [],
