@@ -4,15 +4,21 @@ export default {
   theme: {
     extend: {},
     fontSize: {},
-    fontWeight: {
-      bold: 900,
-      semibold: 600,
-    },
     colors: {
       main: "#0078C5",
       gray: "#e9ecef",
       gray2: "#D1C5C0",
-      darkgray: "#6A6A77",
+      darkGray: "#6A6A77",
+      lightGray: "#F3F3F3",
+
+      red: "#ff0000",
+      orange: "#ff8c00",
+      yellow: "#ffff00",
+      green: "#008000",
+      blue: "#0000ff",
+      indigo: "#4b0082",
+      purple: "#800080",
+      pink: "#FFC0CB",
 
       opacityBlack: "rgba(0, 0, 0, 0.4)",
     },

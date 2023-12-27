@@ -1,3 +1,6 @@
+import { NoteCover } from "@/constants";
+import { NoteCoverColor } from "@/types";
+
 const NoteBooksPage = () => {
   return (
     <div className="grid grid-cols-5 gap-4 p-[50px]">
@@ -12,7 +15,13 @@ const NoteBooksPage = () => {
 
 export default NoteBooksPage;
 
-const MemoItem = ({ children, color }: { children: string; color: string }) => {
+const MemoItem = ({
+  children,
+  color,
+}: {
+  children: string;
+  color: NoteCoverColor;
+}) => {
   return (
     <div className="relative text-[15px]">
       <div
@@ -22,7 +31,7 @@ const MemoItem = ({ children, color }: { children: string; color: string }) => {
         {children}
       </div>
       <div
-        className={`w-[100px] h-[130px] mr-[5px] bg-[${color}] rounded-[10px]`}
+        className={`w-[100px] h-[130px] mr-[5px] ${NoteCover[color]} rounded-[10px]`}
       />
     </div>
   );
