@@ -3,19 +3,34 @@ import { NoteCoverColor } from "@/types";
 
 const NoteBooksPage = () => {
   return (
-    <div className="grid grid-cols-5 gap-4 p-[50px]">
-      <MemoItem color="green">aaaaaaaaa</MemoItem>
-      <MemoItem color="pink">aaaaaaaaa</MemoItem>
-      <MemoItem color="pink">aaaaaaaaa</MemoItem>
-      <MemoItem color="pink">aaaaaaaaa</MemoItem>
-      <MemoItem color="green">aaaaaaaaa</MemoItem>
+    <div className="grid grid-cols-5 gap-4 p-[50px] max-w-[700px]">
+      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
+      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
     </div>
   );
 };
 
 export default NoteBooksPage;
 
-const MemoItem = ({
+const NoteBookItem = ({
   children,
   color,
 }: {

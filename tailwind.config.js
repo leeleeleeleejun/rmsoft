@@ -10,6 +10,7 @@ export default {
       gray2: "#D1C5C0",
       darkGray: "#6A6A77",
       lightGray: "#F3F3F3",
+      lightGray2: "#F8F8F8",
 
       red: "#ff0000",
       orange: "#ff8c00",

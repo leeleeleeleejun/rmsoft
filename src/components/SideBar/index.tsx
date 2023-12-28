@@ -1,18 +1,29 @@
 import ChevronRight from "@/assets/ChevronRight.svg?react";
+import ChevronDown from "@/assets/ChevronDown.svg?react";
+
 import Plus from "@/assets/Plus.svg?react";
 import File from "@/assets/File.svg?react";
 import { NoteCoverColor } from "@/types";
 import { NoteCover } from "@/constants";
+import { useState } from "react";
 
 const SideBar = ({
   openNoteBookModalFunc,
 }: {
   openNoteBookModalFunc: () => void;
 }) => {
+  const [showNoteBooks, setShowNoteBooks] = useState(false);
+
+  const setShowNoteBooksFunc = () => {
+    setShowNoteBooks((prev) => !prev);
+  };
+
   return (
-    <aside className="w-[350px] border-solid border-r border-gray h-dvh">
+    <aside className="min-w-[350px] max-w-[350px] h-dvh border-solid border-r border-gray">
       <div className="flex py-[30px]">
-        <ChevronRight className="mx-[10px] fill-gray2  hover:fill-darkGray" />
+        <button className="mx-[10px] fill-gray2  hover:fill-darkGray">
+          <ChevronRight />
+        </button>
         <File className="w-[16px] mr-[10px]" />
         All Notes
       </div>
@@ -21,7 +32,12 @@ const SideBar = ({
         <li className="mb-[20px] cursor-pointer">
           <div className="flex place-content-between">
             <div className="flex">
-              <ChevronRight className="mx-[10px] fill-gray2 cursor-pointer hover:fill-darkGray" />
+              <button
+                className="w-[10px] mx-[10px] fill-gray2 cursor-pointer hover:fill-darkGray"
+                onClick={setShowNoteBooksFunc}
+              >
+                {showNoteBooks ? <ChevronDown /> : <ChevronRight />}
+              </button>
               NOTEBOOKS
             </div>
             <Plus
@@ -29,14 +45,16 @@ const SideBar = ({
               onClick={openNoteBookModalFunc}
             />
           </div>
-          <ul className="px-[30px] py-[10px]">
-            <NoteBook color="red">
-              aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-            </NoteBook>
-            <NoteBook color="indigo">
-              aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-            </NoteBook>
-          </ul>
+          {showNoteBooks && (
+            <ul className="px-[30px] py-[10px]">
+              <NoteBook color="red">
+                aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              </NoteBook>
+              <NoteBook color="indigo">
+                aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+              </NoteBook>
+            </ul>
+          )}
         </li>
         <FakeListItem>TAGS</FakeListItem>
       </ul>

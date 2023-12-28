@@ -22,8 +22,9 @@ const CreateNoteBookModal = ({
         <div>
           <span className="font-semibold mr-[80px]">Name</span>
           <input
-            className="w-[400px] p-[10px] bg-lightGray rounded text-[14px]"
+            className="w-[400px] p-[10px] bg-lightGray rounded text-[14px] outline-none"
             placeholder="Enter notebook name"
+            type="text"
           />
         </div>
         <div className="flex pt-[30px]">

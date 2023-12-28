@@ -21,7 +21,7 @@ const Layout = () => {
         <CreateNoteBookModal closeNoteBookModalFunc={closeNoteBookModalFunc} />
       )}
       <SideBar openNoteBookModalFunc={openNoteBookModalFunc} />
-      <main>
+      <main className="flex-auto">
         <Outlet />
       </main>
     </div>
