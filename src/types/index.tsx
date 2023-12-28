@@ -8,3 +8,9 @@ export type NoteCoverColor =
   | "purple"
   | "pink"
   | "gray";
+
+export interface NoteBook {
+  name: string;
+  cover: NoteCoverColor;
+  date: string;
+}
