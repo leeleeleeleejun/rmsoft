@@ -55,7 +55,7 @@ const NoteBookPage = () => {
   const deleteNote = (noteNumber: number) => {
     if (currentNoteNumber === null || currentNoteNumber === undefined) return;
     const updatedNoteBook = currentNoteBook.filter(
-      (item, index) => index !== noteNumber
+      (_, index) => index !== noteNumber
     );
 
     localStorage.setItem(location, JSON.stringify(updatedNoteBook));

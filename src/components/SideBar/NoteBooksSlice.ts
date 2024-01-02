@@ -7,7 +7,7 @@ const NoteBooksSlice = createSlice({
   name: "NoteBooksSlice",
   initialState,
   reducers: {
-    setNoteBooks: (state, action) => {
+    setNoteBooks: (_, action) => {
       return action.payload;
     },
   },
