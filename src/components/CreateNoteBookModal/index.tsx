@@ -1,9 +1,11 @@
-import Close from "@/assets/Close.svg?react";
-import { NoteCover } from "@/constants";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
 import { NoteCoverColor } from "@/types";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { setNoteBooks } from "../SideBar/NoteBooksSlice";
+import { setNoteBooks } from "@/components/SideBar/NoteBooksSlice";
+
+import Close from "@/assets/Close.svg?react";
+import NoteCoverItem from "./NoteCoverItem";
 
 const CreateNoteBookModal = ({
   closeNoteBookModalFunc,
@@ -11,7 +13,14 @@ const CreateNoteBookModal = ({
   closeNoteBookModalFunc: () => void;
 }) => {
   const dispatch = useDispatch();
-  const [noteBook, setNoteBook] = useState({ name: "", cover: "" });
+  const editNumber = useSelector(
+    (state: RootState) => state.CreateNoteBookModalSlice
+  ).editNumber;
+  const editTargetKey = useSelector(
+    (state: RootState) => state.CreateNoteBookModalSlice
+  ).editTargetKey;
+  const noteBooks = useSelector((state: RootState) => state.NoteBooksSlice);
+  const [noteBook, setNoteBook] = useState({ name: "", cover: "red" });
 
   const setNoteBookFunc = (key: "name" | "cover", value: string) => {
     setNoteBook((prev) => ({
@@ -30,23 +39,47 @@ const CreateNoteBookModal = ({
       return;
     }
 
-    const current = new Date().toISOString();
-    const newNoteBook = { ...noteBook, date: current };
-    dispatch(setNoteBooks([newNoteBook]));
+    const createDate = String(Date.now());
 
-    const localStorageNoteBooks = JSON.parse(
-      localStorage.getItem("noteBooks") || "[]"
-    );
-    if (localStorageNoteBooks) {
-      localStorage.setItem(
-        "noteBooks",
-        JSON.stringify([...localStorageNoteBooks, noteBook])
-      );
-    } else {
-      localStorage.setItem("noteBooks", JSON.stringify([noteBook]));
-    }
+    const newNoteBook = { ...noteBook, date: createDate };
+    const newNoteBooks = [...noteBooks, newNoteBook];
+    dispatch(setNoteBooks(newNoteBooks));
+
+    localStorage.setItem("noteBooks", JSON.stringify(newNoteBooks));
+    localStorage.setItem(noteBook.name + "-" + createDate, JSON.stringify([]));
+
     closeNoteBookModalFunc();
   };
+
+  const editNoteBook = () => {
+    if (!noteBook.name) {
+      alert("name을 입력해주세요");
+      return;
+    }
+    if (!noteBook.cover) {
+      alert("cover을 선택해주세요");
+      return;
+    }
+    const newNoteBooks = noteBooks.map((item, index) => {
+      if (index === editNumber) {
+        return noteBook;
+      }
+      return item;
+    });
+    dispatch(setNoteBooks(newNoteBooks));
+    localStorage.setItem("noteBooks", JSON.stringify(newNoteBooks));
+    const oldData = localStorage.getItem(editTargetKey);
+    const date = editTargetKey.split("-");
+    localStorage.setItem(noteBook.name + "-" + date[1], oldData || "");
+    localStorage.removeItem(editTargetKey);
+    closeNoteBookModalFunc();
+  };
+
+  useEffect(() => {
+    if (editNumber || editNumber === 0) {
+      setNoteBook(noteBooks[editNumber]);
+    }
+  }, []);
 
   return (
     <div className="w-[100%] h-screen fixed bg-[#00000073] flex items-center z-20">
@@ -69,24 +102,32 @@ const CreateNoteBookModal = ({
             onChange={(e) => {
               setNoteBookFunc("name", e.target.value);
             }}
+            value={noteBook.name}
           />
         </div>
         <div className="flex py-[30px]">
           <span className="font-semibold mr-[80px]">Cover</span>
-          <div className="grid grid-cols-5 gap-4 ">
-            <NoteCoverItem color="red" setNoteBookFunc={setNoteBookFunc} />
-            <NoteCoverItem color="orange" setNoteBookFunc={setNoteBookFunc} />
-            <NoteCoverItem color="yellow" setNoteBookFunc={setNoteBookFunc} />
-            <NoteCoverItem color="green" setNoteBookFunc={setNoteBookFunc} />
-            <NoteCoverItem color="blue" setNoteBookFunc={setNoteBookFunc} />
-            <NoteCoverItem color="indigo" setNoteBookFunc={setNoteBookFunc} />
-            <NoteCoverItem color="purple" setNoteBookFunc={setNoteBookFunc} />
-            <NoteCoverItem color="pink" setNoteBookFunc={setNoteBookFunc} />
-            <NoteCoverItem color="gray" setNoteBookFunc={setNoteBookFunc} />
-          </div>
+          <ul className="grid grid-cols-5 gap-4 ">
+            {coverArray.map((item) => (
+              <NoteCoverItem
+                key={item}
+                cover={item}
+                setNoteBookFunc={setNoteBookFunc}
+                chooseCover={noteBook.cover}
+              />
+            ))}
+          </ul>
         </div>
-        <button className="ml-auto" onClick={registerNoteBook}>
-          Create
+        <button
+          className={`px-[18px] py-[8px] border-solid border-[darkGray] ml-auto text-[14px] rounded 
+          ${
+            noteBook.name && noteBook.cover
+              ? "bg-main text-[white]"
+              : "border-[1px] text-[darkGray]"
+          }`}
+          onClick={editNumber !== null ? editNoteBook : registerNoteBook}
+        >
+          {editNumber !== null ? "Update" : "Create"}
         </button>
       </div>
     </div>
@@ -95,19 +136,14 @@ const CreateNoteBookModal = ({
 
 export default CreateNoteBookModal;
 
-const NoteCoverItem = ({
-  color,
-  setNoteBookFunc,
-}: {
-  color: NoteCoverColor;
-  setNoteBookFunc: (key: "name" | "cover", value: string) => void;
-}) => {
-  return (
-    <button
-      className={`w-[70px] h-[90px] mr-[5px] ${NoteCover[color]} rounded-[10px] cursor-pointer`}
-      onClick={() => {
-        setNoteBookFunc("cover", color);
-      }}
-    />
-  );
-};
+const coverArray: NoteCoverColor[] = [
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "indigo",
+  "purple",
+  "pink",
+  "gray",
+];

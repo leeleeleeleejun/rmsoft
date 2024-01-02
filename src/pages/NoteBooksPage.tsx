@@ -1,29 +1,19 @@
 import { NoteCover } from "@/constants";
 import { NoteCoverColor } from "@/types";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const NoteBooksPage = () => {
+  const noteBooks = useSelector((state: RootState) => state.NoteBooksSlice);
+
   return (
     <div className="grid grid-cols-5 gap-4 p-[50px] max-w-[700px]">
-      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="pink">aaaaaaaaa</NoteBookItem>
-      <NoteBookItem color="green">aaaaaaaaa</NoteBookItem>
+      {noteBooks.map((item, index) => (
+        <Link to={item.name + "-" + item.date} key={index}>
+          <NoteBookItem cover={item.cover}>{item.name}</NoteBookItem>
+        </Link>
+      ))}
     </div>
   );
 };
@@ -32,10 +22,10 @@ export default NoteBooksPage;
 
 const NoteBookItem = ({
   children,
-  color,
+  cover,
 }: {
   children: string;
-  color: NoteCoverColor;
+  cover: NoteCoverColor;
 }) => {
   return (
     <div className="relative text-[15px]">
@@ -46,7 +36,7 @@ const NoteBookItem = ({
         {children}
       </div>
       <div
-        className={`w-[100px] h-[130px] mr-[5px] ${NoteCover[color]} rounded-[10px]`}
+        className={`w-[100px] h-[130px] mr-[5px] ${NoteCover[cover]} rounded-[10px]`}
       />
     </div>
   );

@@ -1,45 +1,56 @@
-import ChevronRight from "@/assets/ChevronRight.svg?react";
-import ChevronDown from "@/assets/ChevronDown.svg?react";
-import Plus from "@/assets/Plus.svg?react";
-import File from "@/assets/File.svg?react";
-import { NoteBook, NoteCoverColor } from "@/types";
-import { NoteCover } from "@/constants";
 import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { NoteBookType } from "@/types";
 import { setNoteBooks } from "./NoteBooksSlice";
+import { useNavigate } from "react-router-dom";
+
+import NoteBook from "./NoteBook";
+import Plus from "@/assets/Plus.svg?react";
+import File from "@/assets/File.svg?react";
+import ChevronDown from "@/assets/ChevronDown.svg?react";
+import ChevronRight from "@/assets/ChevronRight.svg?react";
 
 const SideBar = ({
   openNoteBookModalFunc,
 }: {
   openNoteBookModalFunc: () => void;
 }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const location = decodeURI(useLocation().pathname).slice(1);
   const noteBooks = useSelector((state: RootState) => state.NoteBooksSlice);
-  const [showNoteBooks, setShowNoteBooks] = useState(false);
+
+  const [showNoteBooks, setShowNoteBooks] = useState(true);
+  const [showMenu, setShowMenu] = useState<number | null>(null);
 
   const setShowNoteBooksFunc = () => {
     setShowNoteBooks((prev) => !prev);
   };
 
-  console.log(noteBooks);
-
   useEffect(() => {
-    const localStorageNoteBooks: NoteBook[] = JSON.parse(
+    const localStorageNoteBooks: NoteBookType[] = JSON.parse(
       localStorage.getItem("noteBooks") || "[]"
     );
     dispatch(setNoteBooks(localStorageNoteBooks));
   }, []);
 
+  useEffect(() => {
+    if (!localStorage.getItem(location)) navigate("/");
+  }, [noteBooks]);
+
   return (
     <aside className="min-w-[350px] max-w-[350px] h-dvh border-solid border-r border-gray">
-      <div className="flex py-[30px]">
+      <div className="flex pt-[12px] pb-[30px]">
         <button className="mx-[10px] fill-gray2  hover:fill-darkGray">
           <ChevronRight />
         </button>
         <File className="w-[16px] mr-[10px]" />
         All Notes
+        <span className="ml-[5px] text-[darkGray] text-[14px]">
+          {noteBooks.length}
+        </span>
       </div>
       <ul className="font-semibold text-main">
         <FakeListItem>QUICK ACCESS</FakeListItem>
@@ -52,17 +63,26 @@ const SideBar = ({
               >
                 {showNoteBooks ? <ChevronDown /> : <ChevronRight />}
               </button>
-              NOTEBOOKS
+              <Link to="/" className="hover:text-mainHover">
+                NOTEBOOKS
+              </Link>
             </div>
             <Plus
               className="mx-[10px] fill-main"
               onClick={openNoteBookModalFunc}
             />
           </div>
-          {showNoteBooks && (
+          {noteBooks.length > 0 && showNoteBooks && (
             <ul className="px-[30px] py-[10px]">
               {noteBooks.map((item, index) => (
-                <NoteBook key={index} cover={item.cover}>
+                <NoteBook
+                  showMenu={showMenu}
+                  setShowMenu={setShowMenu}
+                  key={index}
+                  item={item}
+                  index={index}
+                  openNoteBookModalFunc={openNoteBookModalFunc}
+                >
                   {item.name}
                 </NoteBook>
               ))}
@@ -76,25 +96,6 @@ const SideBar = ({
 };
 
 export default SideBar;
-
-const NoteBook = ({
-  children,
-  cover,
-}: {
-  children: string;
-  cover: NoteCoverColor;
-}) => {
-  return (
-    <li className="flex items-end mb-[10px]">
-      <div
-        className={`min-w-[25px] h-[31px] mr-[5px] ${NoteCover[cover]} rounded`}
-      />
-      <p className="mb-[5px] text-ellipsis whitespace-nowrap overflow-hidden">
-        {children}
-      </p>
-    </li>
-  );
-};
 
 const FakeListItem = ({ children }: { children: string }) => {
   return (

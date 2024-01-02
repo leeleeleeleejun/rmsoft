@@ -6,6 +6,8 @@ export default {
     fontSize: {},
     colors: {
       main: "#0078C5",
+      mainHover: "#0068AC",
+
       gray: "#e9ecef",
       gray2: "#D1C5C0",
       darkGray: "#6A6A77",
@@ -21,6 +23,7 @@ export default {
       purple: "#800080",
       pink: "#FFC0CB",
 
+      skyBlue: "#E4F2FE",
       opacityBlack: "rgba(0, 0, 0, 0.4)",
     },
   },

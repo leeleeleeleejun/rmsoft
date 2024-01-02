@@ -2,8 +2,12 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import SideBar from "@/components/SideBar";
 import CreateNoteBookModal from "@/components/CreateNoteBookModal";
+import { setEditNumber } from "@/components/CreateNoteBookModal/CreateNoteBookModalSlice";
+import { useDispatch } from "react-redux";
 
 const Layout = () => {
+  const dispatch = useDispatch();
+
   const [CreateNewNoteBookModal, setCreateNewNoteBookModal] =
     useState<boolean>(false);
 
@@ -12,6 +16,7 @@ const Layout = () => {
   };
 
   const closeNoteBookModalFunc = () => {
+    dispatch(setEditNumber(null));
     setCreateNewNoteBookModal(false);
   };
 

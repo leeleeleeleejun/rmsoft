@@ -1,32 +1,122 @@
-import { EditorState } from "lexical";
-import { useEffect, useState } from "react";
-
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-//import { PlainTextPlugin } from "@lexical/react/LexicalPlainTextPlugin";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-//import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { NoteBasicContent } from "@/constants";
+import formatDateToCustom from "@/util/formatDateToCustom";
+import { Note } from "@/types";
+import Editor from "@/components/Editor";
+import Minus from "@/assets/Minus.svg?react";
 
 const NoteBookPage = () => {
+  const location = decodeURI(useLocation().pathname).slice(1);
+  const pathName = location.split("-");
+  const timer = useRef<number | null>(null);
+  const currentNoteBook: Note[] = JSON.parse(
+    localStorage.getItem(location) || "[]"
+  );
+
+  const [currentNote, setCurrentNote] = useState<Note>();
+  const [currentNoteNumber, setCurrentNoteNumber] = useState<number | null>(
+    null
+  );
+
+  const setCurrentNoteContentFunc = (value: string) => {
+    if (currentNoteNumber === null || currentNoteNumber === undefined) return;
+
+    const currentDate = new Date();
+    const updatedNote = { content: value, date: currentDate };
+    setCurrentNote(updatedNote);
+
+    currentNoteBook[currentNoteNumber] = updatedNote;
+
+    if (timer.current) {
+      clearTimeout(timer.current);
+    }
+    timer.current = window.setTimeout(() => {
+      if (timer.current) {
+        clearTimeout(timer.current);
+        timer.current = null;
+      }
+      localStorage.setItem(location, JSON.stringify(currentNoteBook));
+    }, 500);
+  };
+
+  const createNote = () => {
+    const currentDate = new Date();
+    const newNote = {
+      content: NoteBasicContent,
+      date: currentDate,
+    };
+
+    currentNoteBook.push(newNote);
+    setCurrentNoteNumber(currentNoteBook.length - 1);
+    localStorage.setItem(location, JSON.stringify(currentNoteBook));
+  };
+
+  const deleteNote = (noteNumber: number) => {
+    if (currentNoteNumber === null || currentNoteNumber === undefined) return;
+    const updatedNoteBook = currentNoteBook.filter(
+      (item, index) => index !== noteNumber
+    );
+
+    localStorage.setItem(location, JSON.stringify(updatedNoteBook));
+    window.location.reload();
+  };
+
+  useEffect(() => {
+    if (currentNoteBook.length > 0) {
+      setCurrentNoteNumber(0);
+    } else {
+      setCurrentNoteNumber(null);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    return () => {
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="flex">
-      <div className="border-solid border-r border-gray h-dvh">
-        <div className="p-[12px] bg-lightGray2 border-b border-solid border-gray">
-          aaaaa
+      <div className="border-solid border-r border-gray min-w-[340px] h-dvh">
+        <div className="flex justify-between items-center p-[12px] bg-lightGray2 border-b border-solid border-gray">
+          {pathName[0]}
+          <button
+            className="text-[13px] p-[5px] text-[white] bg-main rounded"
+            onClick={createNote}
+          >
+            New Note
+          </button>
         </div>
         <ul>
-          <MemoItem />
-          <MemoItem />
-          <MemoItem />
-          <MemoItem />
+          {currentNoteBook.map((item, index) => (
+            <NoteItem
+              key={index}
+              item={index === currentNoteNumber ? currentNote || item : item}
+              active={index === currentNoteNumber}
+              onClick={() => {
+                setCurrentNoteNumber(index);
+              }}
+              deleteNote={() => {
+                setCurrentNoteNumber(index);
+                const userAnswer = confirm("해당 Note를 삭제하시겠습니까?");
+                if (userAnswer) deleteNote(index);
+              }}
+            />
+          ))}
         </ul>
       </div>
       <div className="relative w-[400px] flex-auto">
-        <Editor />
+        {(currentNoteNumber || currentNoteNumber === 0) && (
+          <Editor
+            onChangeFunc={setCurrentNoteContentFunc}
+            currentNoteBook={currentNoteBook}
+            currentNoteNumber={currentNoteNumber || 0}
+            location={location}
+          />
+        )}
       </div>
     </div>
   );
@@ -34,78 +124,56 @@ const NoteBookPage = () => {
 
 export default NoteBookPage;
 
-const MemoItem = () => {
-  return (
-    <li className="w-[300px] flex gap-[20px] flex-col box-content py-[20px] mx-[20px] text-[14px] border-b border-solid border-gray">
-      <div className="font-semibold">New Note</div>
-      <div className="text-ellipsis whitespace-nowrap overflow-hidden">
-        가나다라마바사아자차카타파하가나다라마바사아자차카타파하
-      </div>
-      <div className="text-[gray] text-[11px] font-thin">Today, 2:21 PM</div>
-    </li>
-  );
-};
-
-function MyCustomAutoFocusPlugin() {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {
-    // Focus the editor when the effect fires!
-    editor.focus();
-  }, [editor]);
-
-  return null;
-}
-
-function MyOnChangePlugin({
-  onChange,
+const NoteItem = ({
+  item,
+  onClick,
+  deleteNote,
+  active,
 }: {
-  onChange: (editorState: EditorState) => void;
-}) {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
-      onChange(editorState);
-    });
-  }, [editor, onChange]);
-
-  return null;
-}
-
-function Editor() {
-  const [editorState, setEditorState] = useState<string>();
-  const initialConfig = {
-    namespace: "MyEditor",
-    onError: (error: Error) => {
-      console.error(error);
-    },
+  item: Note;
+  onClick: () => void;
+  deleteNote: () => void;
+  active: boolean;
+}) => {
+  const content = item?.content ? JSON.parse(item.content) : {};
+  const formattedDate = formatDateToCustom(new Date(item?.date || ""));
+  const [showDelete, setShowDelete] = useState(false);
+  const onMouseOver = () => {
+    setShowDelete(true);
+  };
+  const onMouseLeave = () => {
+    setShowDelete(false);
   };
 
   return (
-    <LexicalComposer initialConfig={initialConfig}>
-      <RichTextPlugin
-        contentEditable={
-          <ContentEditable
-            className="flex flex-col gap-[5px] w-[100%] h-dvh p-[20px] outline-none [&>*:first-child]:font-semibold 
-          [&>*:first-child]:text-[24px]  [&>*:first-child]:mb-[5px] "
-          />
-        }
-        placeholder={
-          <div className="absolute top-0 left-[5px] p-[22px] text-gray2 ">
-            Type / for menu or Select From Templates
-          </div>
-        }
-        ErrorBoundary={LexicalErrorBoundary}
-      />
-      <HistoryPlugin />
-      <MyCustomAutoFocusPlugin />
-      <MyOnChangePlugin
-        onChange={(editorState) => {
-          const editorStateJSON = editorState.toJSON();
-          setEditorState(JSON.stringify(editorStateJSON));
-        }}
-      />
-    </LexicalComposer>
+    <li
+      onMouseOver={onMouseOver}
+      onMouseLeave={onMouseLeave}
+      className={`w-[300px] flex gap-[15px] flex-col box-content py-[20px] px-[20px] text-[14px] border-b border-solid border-gray
+       relative cursor-pointer ${active && "bg-skyBlue"}`}
+      onClick={onClick}
+    >
+      <div className="font-semibold">
+        {content.root?.children?.[0]?.children?.[0]?.text || "New Note"}
+      </div>
+      <div className="w-[90%] h-[18px] text-ellipsis whitespace-nowrap overflow-hidden text-[gray]">
+        {content.root?.children?.[1]?.children?.[0]?.text ||
+          "No additional text"}
+      </div>
+      {showDelete && (
+        <button
+          className="w-[10px] absolute right-[20px] top-[45%]"
+          onClick={() => {
+            deleteNote();
+          }}
+        >
+          <Minus className="fill-[gray]" />
+        </button>
+      )}
+
+      <div className="text-[gray] text-[11px] font-thin">
+        {formattedDate || ""}
+      </div>
+    </li>
   );
-}
+};
